@@ -121,9 +121,10 @@ class BasePipeline(ABC):
     def log_param_count(self, model=None):
         if model is None:
             model = self.model
-        trainable_count = np.sum(
+        # NumPy 2 ya no acepta np.sum(generador); se usa sum() de Python
+        trainable_count = sum(
             tf.keras.backend.count_params(w) for w in model.trainable_weights)
-        non_trainable_count = np.sum(
+        non_trainable_count = sum(
             tf.keras.backend.count_params(w)
             for w in model.non_trainable_weights)
         log.info("###################################")
