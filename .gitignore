@@ -130,3 +130,6 @@ dmypy.json
 
 # Macos folder properties
 .DS_Store
+
+# Objetos de compilación de utils/tools (make)
+*.o
