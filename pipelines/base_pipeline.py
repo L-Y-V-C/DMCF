@@ -21,6 +21,16 @@ logging.basicConfig(
 log = logging.getLogger(__name__)
 
 
+def _current_lr(optimizer):
+    """Learning rate actual. `_decayed_lr` (privado) no existe en Keras >= 2.11."""
+    if hasattr(optimizer, '_decayed_lr'):
+        return optimizer._decayed_lr(tf.float32)
+    lr = optimizer.learning_rate
+    if isinstance(lr, tf.keras.optimizers.schedules.LearningRateSchedule):
+        lr = lr(optimizer.iterations)
+    return tf.cast(lr, tf.float32)
+
+
 class BasePipeline(ABC):
     """
     Base pipeline class
@@ -145,12 +155,11 @@ class BasePipeline(ABC):
                 if isinstance(self.optimizer, list):
                     for i in range(len(self.optimizer)):
                         tf.summary.scalar('train/learning_rate_%d' % i,
-                                          self.optimizer[i]._decayed_lr(
-                                              tf.float32),
+                                          _current_lr(self.optimizer[i]),
                                           step=epoch)
                 else:
                     tf.summary.scalar('train/learning_rate',
-                                      self.optimizer._decayed_lr(tf.float32),
+                                      _current_lr(self.optimizer),
                                       step=epoch)
 
     def load_ckpt(self, ckpt_path=None, is_resume=True):
