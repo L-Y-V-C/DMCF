@@ -135,7 +135,7 @@ class Simulator(BasePipeline):
 
         for i in tqdm(range(len(results)), desc='write out'):
             data = test_data[i]
-            pos = np.stack(r[0] for r in results[i])
+            pos = np.stack([r[0] for r in results[i]])  # NumPy 2: np.stack requiere lista, no generador
 
             out_dir = os.path.join(self.cfg.out_dir, "visual", "%04d" % i)
             if not os.path.exists(out_dir):
